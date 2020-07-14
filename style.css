@@ -1,6 +1,6 @@
-:root {
-    font-size: 62.5%;
-}
+:root {font-size: 62.5%;}
+
+@media (max-width: 41.6rem) {body {width: fit-content}}
 
 * {
     margin: auto;
@@ -16,6 +16,8 @@ h1 {
 
 div#header {
     height: 14rem;
+    width: 100%;
+    margin: auto;
 }
 
 div#container {
@@ -25,21 +27,19 @@ div#container {
     height: 50rem;
     width: 35rem;
     display: grid;
-    /* grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr;
-    grid-template-columns: 1fr 1fr 1fr 1fr; */
     grid-template:
         /* d: display, n: number, o: operator, e: =, b: backspace */
-        'd d d d' 1.3fr
+        'd d d d' 1.5fr
         '. . . o' 1fr
         '. . . o' 1fr
         '. . . o' 1fr
         '. . b o' 1fr
         'e e e c' 1fr / 1.3fr 1.3fr 1.3fr 1fr;
-    gap: 1.5rem;
+    gap: 1rem;
     background-color: rgb(230, 230, 230);
     border: 0.3rem black solid;
     border-radius: 2rem;
-    box-shadow: 5px 4px 17px 0px rgba(50, 50, 50, 0.64);
+    box-shadow: 0.5rem 0.4rem 1.7rem 0 rgba(50, 50, 50, 0.64);
 }
 
 input,
@@ -49,7 +49,12 @@ div#display {
     height: 100%;
     width: 100%;
     outline: none;
+    box-shadow: 0 0 0.25rem rgba(50, 50, 50, 0.64);
 }
+
+input {cursor: pointer;}
+
+
 
 div#display {
     grid-area: d;
