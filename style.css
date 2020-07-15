@@ -28,13 +28,13 @@ div#container {
     width: 35rem;
     display: grid;
     grid-template:
-        /* d: display, n: number, o: operator, e: =, b: backspace */
+        /* d: display, e: = */
         'd d d d' 1.5fr
-        '. . . o' 1fr
-        '. . . o' 1fr
-        '. . . o' 1fr
-        '. . b o' 1fr
-        'e e e c' 1fr / 1.3fr 1.3fr 1.3fr 1fr;
+        '. . . .' 1fr
+        '. . . .' 1fr
+        '. . . .' 1fr
+        '. . . .' 1fr
+        'e e e .' 1fr / 1.3fr 1.3fr 1.3fr 1fr;
     gap: 1rem;
     background-color: rgb(230, 230, 230);
     border: 0.3rem black solid;
@@ -70,23 +70,16 @@ div#display > p {
     padding-right: 2rem;
 }
 
-input.equals {
-    grid-area: e;
-}
+input.equals {grid-area: e}
+input.equals:hover {background-color: rgba(230, 230, 230, 0.5)}
 
-input.backspace {
-    grid-area: b;
-}
+input.clear {background-color: rgb(123, 213, 255)}
+input.clear:hover {background-color: rgb(88, 202, 255)}
 
-input.clear {
-    grid-area: c;
-    background-color: rgb(123, 213, 255);
-}
+input.backspace:hover {background-color: rgba(230, 230, 230, 0.5);}
 
-input.number {
-    background-color: white;
-}
+input.number {background-color: white}
+input.number:hover {background-color: rgb(245, 245, 245)}
 
-input.operator {
-    background-color: rgb(255, 200, 80);
-}
+input.operator {background-color: rgb(255, 200, 80)}
+input.operator:hover {background-color: rgb(255, 187, 41)}
