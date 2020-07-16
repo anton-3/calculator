@@ -18,8 +18,9 @@ const btnMultiply = document.querySelector('input[value="×"]');
 const btnSubtract = document.querySelector('input[value="-"]');
 const btnAdd = document.querySelector('input[value="+"]');
 const btnClear = document.querySelector('input[value="C"]');
-let displayValue = document.querySelector('div#display > p');
+const btnsNotClear = document.querySelectorAll('input.i');
 const operatorArray = ['+', '-', '×', '÷'];
+let displayValue = document.querySelector('div#display > p');
 
 // event listeners
 
@@ -50,12 +51,12 @@ btnBackspace.addEventListener('click', () => {
         backspace(2);
     }
 });
-btnClear.addEventListener('click', () => {displayValue.textContent = ''});
-
-btnEquals.addEventListener('click', () => {
-    let displayArray = displayValue.textContent.split(/ \+ | - | × | ÷ /);
-    console.log(displayArray);
+btnClear.addEventListener('click', () => {
+    displayValue.textContent = '';
+    btnsNotClear.forEach(btn => {btn.disabled = false});
 });
+
+btnEquals.addEventListener('click', () => {calculate()});
 
 window.addEventListener('keydown', e => {
     switch (e.code) {
@@ -128,8 +129,34 @@ window.addEventListener('keydown', e => {
 
 // functions
 
+function calculate() {
+    let numArray = displayValue.textContent.split(/ \+ | - | × | ÷ /);
+    let opArray = displayValue.textContent.split(/[0123456789\.]/);
+    opArray = removeSpaces(opArray);
+    if (checkInvalid(numArray, opArray)) {
+        console.log('INVALID');
+        return;
+    }
+    console.log(numArray);
+    console.log(opArray);
+    console.log('VALID');
+}
+
+function checkInvalid(numArray, opArray) {
+    if (numArray.includes('') && numArray.length > 1) {
+        return true;
+    }
+}
+
+function removeSpaces(array) {
+    let newArray = array;
+    newArray = newArray.filter(value => value !== '');
+    newArray = newArray.map(value => value[1]);
+    return newArray;
+}
+
 function display(input) {
-    if (!(displayValue.clientWidth < 320)) return;
+    if (displayValue.clientWidth >= 320) return;
     displayValue.textContent += input;
 }
 
