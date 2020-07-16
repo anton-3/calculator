@@ -19,7 +19,7 @@ const btnSubtract = document.querySelector('input[value="-"]');
 const btnAdd = document.querySelector('input[value="+"]');
 const btnClear = document.querySelector('input[value="C"]');
 let displayValue = document.querySelector('div#display > p');
-displayValue.textContent = ''
+const operatorArray = ['+', '-', '×', '÷'];
 
 // event listeners
 
@@ -33,79 +33,92 @@ btn6.addEventListener('click', () => {display(btn6.value)});
 btn7.addEventListener('click', () => {display(btn7.value)});
 btn8.addEventListener('click', () => {display(btn8.value)});
 btn9.addEventListener('click', () => {display(btn9.value)});
-btnDecimal.addEventListener('click', () => {display(btnDecimal.value)});
+btnDecimal.addEventListener('click', () => {
+    // this check will cause problems
+    // maybe fix by splitting str into array between operators?
+    if (displayValue.textContent.includes('.')) return;
+    display(btnDecimal.value)
+});
+btnDivide.addEventListener('click', () => {display(' ' + btnDivide.value + ' ')});
+btnMultiply.addEventListener('click', () => {display(' ' + btnMultiply.value + ' ')});
+btnSubtract.addEventListener('click', () => {display(' ' + btnSubtract.value + ' ')});
+btnAdd.addEventListener('click', () => {display(' ' + btnAdd.value + ' ')});
 
 btnBackspace.addEventListener('click', () => {
-    displayValue.textContent = displayValue.textContent
-    .substring(0, displayValue.textContent.length - 1);
+    backspace(1);
+    if (checkOperator()) {
+        backspace(2);
+    }
 });
-btnClear.addEventListener('click', () => {
-    displayValue.textContent = '';
+btnClear.addEventListener('click', () => {displayValue.textContent = ''});
+
+btnEquals.addEventListener('click', () => {
+    let displayArray = displayValue.textContent.split(/ \+ | - | × | ÷ /);
+    console.log(displayArray);
 });
 
-
-
-document.addEventListener('keydown', e => {
+window.addEventListener('keydown', e => {
     switch (e.code) {
-        case 'Digit0':
-            btn0.click();
-            break;
-        case 'Digit1':
-            btn1.click();
-            break;
-        case 'Digit2':
-            btn2.click();
-            break;
-        case 'Digit3':
-            btn3.click();
-            break;
-        case 'Digit4':
-            btn4.click();
-            break;
-        case 'Digit5':
-            btn5.click();
-            break;
-        case 'Digit6':
-            btn6.click();
-            break;
-        case 'Digit7':
-            btn7.click();
-            break;
-        case 'Digit8':
-            btn8.click();
-            break;
-        case 'Digit9':
-            btn9.click();
-            break;
-        case 'Period':
-            btnDecimal.click();
-            break;
         case 'KeyC':
             btnClear.click();
             break;
+        case 'KeyX':
+            btnMultiply.click();
+            break;
+    }
+
+    switch (e.key) {
+        case '1':
+            btn1.click();
+            break;
+        case '2':
+            btn2.click();
+            break;
+        case '3':
+            btn3.click();
+            break;
+        case '4':
+            btn4.click();
+            break;
+        case '5':
+            btn5.click();
+            break;
+        case '6':
+            btn6.click();
+            break;
+        case '7':
+            btn7.click();
+            break;
+        case '8':
+            btn8.click();
+            break;
+        case '9':
+            btn9.click();
+            break;
+        case '0':
+            btn0.click();
+            break;
+        case '.':
+            btnDecimal.click();
+            break;
         case 'Enter':
+            document.activeElement.blur();
             btnEquals.click();
             break;
-        case 'Equal':
+        case '=':
             btnEquals.click();
             break;
         case 'Backspace':
             btnBackspace.click();
             break;
-        case 'Slash':
+        case '/':
             btnDivide.click();
             break;
-        case 'KeyX':
-            btnMultiply.click();
-            break;
-        case 'Minus':
-            btnSubtract.click();
-            break;
-    }
-
-    switch (e.key) {
         case '*':
             btnMultiply.click();
+            break;
+        case '-':
+            btnSubtract.click();
             break;
         case '+':
             btnAdd.click();
@@ -116,7 +129,18 @@ document.addEventListener('keydown', e => {
 // functions
 
 function display(input) {
+    if (!(displayValue.clientWidth < 320)) return;
     displayValue.textContent += input;
+}
+
+function backspace(num) {
+    displayValue.textContent = displayValue.textContent
+    .substring(0, displayValue.textContent.length - num);
+}
+
+function checkOperator() {
+    return operatorArray.includes(displayValue
+    .textContent[displayValue.textContent.length - 1])
 }
 
 function operate(operator, a, b) {
