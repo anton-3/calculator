@@ -35,9 +35,6 @@ btn7.addEventListener('click', () => {display(btn7.value)});
 btn8.addEventListener('click', () => {display(btn8.value)});
 btn9.addEventListener('click', () => {display(btn9.value)});
 btnDecimal.addEventListener('click', () => {
-    // this check will cause problems
-    // maybe fix by splitting str into array between operators?
-    if (displayValue.textContent.includes('.')) return;
     display(btnDecimal.value)
 });
 btnDivide.addEventListener('click', () => {display(' ' + btnDivide.value + ' ')});
@@ -133,8 +130,15 @@ function calculate() {
     let numArray = displayValue.textContent.split(/ \+ | - | × | ÷ /);
     let opArray = displayValue.textContent.split(/[0123456789\.]/);
     opArray = removeSpaces(opArray);
-    if (checkInvalid(numArray, opArray)) {
+    // numArray must be made of strings for checkInvalid
+    const invalid = checkInvalid(numArray, opArray);
+    if (invalid === true) {
         console.log('INVALID');
+        console.log(numArray);
+        return;
+    } else if (invalid === 'divide0') {
+        alert('nope');
+        console.log('VERY INVALID');
         return;
     }
     console.log(numArray);
@@ -143,9 +147,18 @@ function calculate() {
 }
 
 function checkInvalid(numArray, opArray) {
-    if (numArray.includes('') && numArray.length > 1) {
-        return true;
+    let invalid = false;
+    // check for multiple operators in a row
+    if (numArray.includes('') && numArray.length > 1) invalid = true;
+    // check for multiple decimals in a number or digitless decimal
+    if (numArray.some(value => {
+        return value === '.' || value.split('.').length > 2;
+    })) invalid = true;
+    // check for dividing by 0
+    for (let i = 0; i < opArray.length; i++) {
+        if (opArray[i] === '÷' && parseFloat(numArray[i + 1]) === 0) invalid = 'divide0';
     }
+    return invalid;
 }
 
 function removeSpaces(array) {
