@@ -130,13 +130,14 @@ function calculate() {
     let numArray = displayValue.textContent.split(/ \+ | - | × | ÷ /);
     let opArray = displayValue.textContent.split(/[0123456789\.]/);
     opArray = removeSpaces(opArray);
-    // numArray must be made of strings for checkInvalid
-    const invalid = checkInvalid(numArray, opArray);
-    if (invalid === true) {
+    // numArray must be made of strings for checkValid
+    const valid = checkValid(numArray, opArray);
+    numArray = numArray.map(n => +n);
+
+    if (valid === false) {
         console.log('INVALID');
-        console.log(numArray);
         return;
-    } else if (invalid === 'divide0') {
+    } else if (valid === 'divide0') {
         alert('nope');
         console.log('VERY INVALID');
         return;
@@ -144,21 +145,67 @@ function calculate() {
     console.log(numArray);
     console.log(opArray);
     console.log('VALID');
+
+    displayValue.textContent = eval(numArray, opArray);
 }
 
-function checkInvalid(numArray, opArray) {
-    let invalid = false;
+function eval(numArray, opArray) {
+    // spread syntax is IMPORTANT
+    let nums = [...numArray];
+    let ops = [...opArray];
+    // need another ops that stays constant during foreach loops
+    let loopOps = [...ops];
+    let solution;
+
+    // multiply and divide first
+    loopOps.forEach((op, index) => {
+        if (op === '×' || op === '÷') {
+            
+        }
+    });
+
+    loopOps = [...ops];
+    solution = nums[0];
+
+    // then add and subtract
+    loopOps.forEach((op, index) => {
+        solution = operate(op, solution, nums[index + 1]);
+        ops.shift();
+    });
+
+    return solution;
+}
+
+function operate(operator, a, b) {
+    switch (operator) {
+        case '+': return add(a, b);
+        case '-': return subtract(a, b);
+        case '×': return multiply(a, b);
+        case '÷': return divide(a, b);
+    }
+}
+
+function add(a, b) {return a + b}
+
+function subtract(a, b) {return a - b}
+
+function multiply(a, b) {return a * b}
+
+function divide(a, b) {return a / b}
+
+function checkValid(numArray, opArray) {
+    let valid = true;
     // check for multiple operators in a row
-    if (numArray.includes('') && numArray.length > 1) invalid = true;
+    if (numArray.includes('') && numArray.length > 1) valid = false;
     // check for multiple decimals in a number or digitless decimal
     if (numArray.some(value => {
         return value === '.' || value.split('.').length > 2;
-    })) invalid = true;
+    })) valid = false;
     // check for dividing by 0
     for (let i = 0; i < opArray.length; i++) {
-        if (opArray[i] === '÷' && parseFloat(numArray[i + 1]) === 0) invalid = 'divide0';
+        if (opArray[i] === '÷' && parseFloat(numArray[i + 1]) === 0) valid = 'divide0';
     }
-    return invalid;
+    return valid;
 }
 
 function removeSpaces(array) {
@@ -182,21 +229,3 @@ function checkOperator() {
     return operatorArray.includes(displayValue
     .textContent[displayValue.textContent.length - 1])
 }
-
-function operate(operator, a, b) {
-    switch (operator) {
-        case '+': return add(a, b);
-        case '-': return subtract(a, b);
-        case '*': return multiply(a, b);
-        case '/': return divide(a, b);
-        default: return 'ERROR';
-    }
-}
-
-function add(a, b) {return a + b}
-
-function subtract(a, b) {return a - b}
-
-function multiply(a, b) {return a * b}
-
-function divide(a, b) {return a / b}
