@@ -18,12 +18,13 @@ const btnMultiply = document.querySelector('input[value="×"]');
 const btnSubtract = document.querySelector('input[value="-"]');
 const btnAdd = document.querySelector('input[value="+"]');
 const btnClear = document.querySelector('input[value="C"]');
-const btnsNotClear = document.querySelectorAll('input.i');
+const btns = document.querySelectorAll('input');
 const operatorArray = ['+', '-', '×', '÷'];
-let displayValue = document.querySelector('div#display > p');
+const displayValue = document.querySelector('div#display > p');
 
 // event listeners
 
+// btns.addEventListener('click', () => {});
 btn0.addEventListener('click', () => {display(btn0.value)});
 btn1.addEventListener('click', () => {display(btn1.value)});
 btn2.addEventListener('click', () => {display(btn2.value)});
@@ -34,9 +35,7 @@ btn6.addEventListener('click', () => {display(btn6.value)});
 btn7.addEventListener('click', () => {display(btn7.value)});
 btn8.addEventListener('click', () => {display(btn8.value)});
 btn9.addEventListener('click', () => {display(btn9.value)});
-btnDecimal.addEventListener('click', () => {
-    display(btnDecimal.value)
-});
+btnDecimal.addEventListener('click', () => {display(btnDecimal.value)});
 btnDivide.addEventListener('click', () => {display(' ' + btnDivide.value + ' ')});
 btnMultiply.addEventListener('click', () => {display(' ' + btnMultiply.value + ' ')});
 btnSubtract.addEventListener('click', () => {display(' ' + btnSubtract.value + ' ')});
@@ -48,9 +47,9 @@ btnBackspace.addEventListener('click', () => {
         backspace(2);
     }
 });
+
 btnClear.addEventListener('click', () => {
     displayValue.textContent = '';
-    btnsNotClear.forEach(btn => {btn.disabled = false});
 });
 
 btnEquals.addEventListener('click', () => {calculate()});
@@ -146,10 +145,10 @@ function calculate() {
     console.log(opArray);
     console.log('VALID');
 
-    displayValue.textContent = eval(numArray, opArray);
+    displayValue.textContent = evaluate(numArray, opArray);
 }
 
-function eval(numArray, opArray) {
+function evaluate(numArray, opArray) {
     // spread syntax is IMPORTANT
     let nums = [...numArray];
     let ops = [...opArray];
@@ -173,6 +172,7 @@ function eval(numArray, opArray) {
         ops.shift();
     });
 
+    displayValue.classList.add('solution');
     return solution;
 }
 
@@ -216,7 +216,11 @@ function removeSpaces(array) {
 }
 
 function display(input) {
-    if (displayValue.clientWidth >= 320) return;
+    if (displayValue.classList.contains('solution')) {
+        btnClear.click();
+        displayValue.classList.remove('solution');
+    }
+    if (displayValue.clientWidth / displayValue.parentElement.clientWidth >= .91) return;
     displayValue.textContent += input;
 }
 
