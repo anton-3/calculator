@@ -8,6 +8,10 @@
     font-size: 3rem;
 }
 
+body {
+    background-color: rgb(245, 245, 245);
+}
+
 h1 {
     text-align: center;
     padding-top: 5rem;
@@ -23,7 +27,7 @@ div#header {
 div#container {
     margin: auto; /* this is necessary for some reason */
     font-size: 3rem;
-    padding: 3rem;
+    padding: 2.5rem;
     height: 50rem;
     width: 35rem;
     display: grid;
