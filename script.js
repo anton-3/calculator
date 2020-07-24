@@ -52,6 +52,7 @@ btnClear.addEventListener('click', () => {
 });
 
 btnEquals.addEventListener('click', () => {
+    if (displayValue.textContent === 'ERR') return;
     const solution = calculate(displayValue.textContent);
     // if (solution === 'ERR') return;
     btnClear.click();
