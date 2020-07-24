@@ -4,4 +4,4 @@ a simple on-screen calculator using javascript
 
 live version [here](https://anton-a-a.github.io/calculator)
 
-part of the curriculum at [the odin project](https://www.theodinproject.com)
+part of the curriculum at [the odin project](https://www.theodinproject.com/courses/web-development-101/lessons/calculator)
