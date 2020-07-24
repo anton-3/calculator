@@ -24,7 +24,6 @@ const displayValue = document.querySelector('div#display > p');
 
 // event listeners
 
-// btns.addEventListener('click', () => {});
 btn0.addEventListener('click', () => {display(btn0.value)});
 btn1.addEventListener('click', () => {display(btn1.value)});
 btn2.addEventListener('click', () => {display(btn2.value)});
@@ -52,7 +51,13 @@ btnClear.addEventListener('click', () => {
     displayValue.textContent = '';
 });
 
-btnEquals.addEventListener('click', () => {calculate()});
+btnEquals.addEventListener('click', () => {
+    const solution = calculate(displayValue.textContent);
+    // if (solution === 'ERR') return;
+    btnClear.click();
+    display(solution);
+    displayValue.classList.add('solution');
+});
 
 window.addEventListener('keydown', e => {
     switch (e.code) {
@@ -125,55 +130,101 @@ window.addEventListener('keydown', e => {
 
 // functions
 
-function calculate() {
-    let numArray = displayValue.textContent.split(/ \+ | - | × | ÷ /);
-    let opArray = displayValue.textContent.split(/[0123456789\.]/);
-    opArray = removeSpaces(opArray);
-    // numArray must be made of strings for checkValid
-    const valid = checkValid(numArray, opArray);
-    numArray = numArray.map(n => +n);
-
+function calculate(input) {
+    const valid = checkValid(input);
     if (valid === false) {
         console.log('INVALID');
-        return;
+        return 'ERR';
     } else if (valid === 'divide0') {
         alert('nope');
         console.log('VERY INVALID');
-        return;
+        return 'ERR';
     }
-    console.log(numArray);
-    console.log(opArray);
     console.log('VALID');
-
-    displayValue.textContent = evaluate(numArray, opArray);
+    
+    const equation = parseOrderOfOps(input);
+    console.log(input);
+    console.log(JSON.stringify(equation));
+    displayValue.classList.add('solution');
+    return evaluate(equation);
 }
 
-function evaluate(numArray, opArray) {
-    // spread syntax is IMPORTANT
-    let nums = [...numArray];
-    let ops = [...opArray];
-    // need another ops that stays constant during foreach loops
-    let loopOps = [...ops];
-    let solution;
+// this function took me 5 hours
+function evaluate(equation) {
+    if (typeof equation === 'number') return equation;
+    let solution = evaluate(equation[0]);
 
-    // multiply and divide first
-    loopOps.forEach((op, index) => {
-        if (op === '×' || op === '÷') {
-            
+    for (let i = 0; i < equation.length - 2; i += 2) {
+        const op = equation[i+1];
+        const num = evaluate(equation[i+2]);
+        solution = operate(op, solution, num);
+    }
+
+    return solution;
+}
+
+function parseOrderOfOps(input) {
+    let eq = input.split(' ');
+    // convert numbers in equation to number data type
+    eq = eq.map((x, i) => {
+        return i % 2 === 0 ? +x : x;
+    });
+
+    // move operations with priority into their own arrays ex. [1,'+',[1,'*',1],'-',1]
+    let mdIndexes = [];
+    let mdSlices = [];
+    eq.forEach((value, i) => {
+        if (value === '×' || value === '÷') mdIndexes.push(i);
+    });
+    while (mdIndexes.length > 0) {
+        const start = 0;
+        const end = mdIndexes.findIndex((n, i) => mdIndexes[i+1] - n !== 2);
+        mdSlices.push([mdIndexes[start], mdIndexes[end]]);
+        mdIndexes.splice(start, end + 1);
+    }
+    mdSlices.forEach(mdSlice => {
+        const startIndex = mdSlice[0] - 1; // inclusive
+        const endIndex = mdSlice[1] + 2; // exclusive
+        const length = endIndex - startIndex;
+        const slice = eq.slice(startIndex, endIndex);
+        eq.splice(startIndex, length, slice);
+        for (let i = 0; i < length - 1; i++) {
+            eq.splice(startIndex, 0, null);
         }
     });
+    eq = eq.filter(x => x !== null);
 
-    loopOps = [...ops];
-    solution = nums[0];
+    return eq;
+}
 
-    // then add and subtract
-    loopOps.forEach((op, index) => {
-        solution = operate(op, solution, nums[index + 1]);
-        ops.shift();
-    });
+function display(input) {
+    if (displayValue.classList.contains('solution')) {
+        btnClear.click();
+        displayValue.classList.remove('solution');
+    }
+    if (displayValue.clientWidth / displayValue.parentElement.clientWidth >= .91) return;
+    displayValue.textContent += input;
+}
 
-    displayValue.classList.add('solution');
-    return solution;
+function checkValid(input) {
+    let valid = true;
+    const nums = input.split(/ \+ | - | × | ÷ /);
+    const ops = removeSpaces(input.split(/[0123456789\.]/));
+
+    // check for multiple operators in a row
+    if (nums.includes('') && nums.length > 1) valid = false;
+
+    // check for multiple decimals in a number or digitless decimal
+    if (nums.some(value => { 
+        return value === '.' || value.split('.').length > 2;
+    })) valid = false;
+
+    // check for dividing by 0
+    for (let i = 0; i < ops.length; i++) {
+        if (ops[i] === '÷' && parseFloat(nums[i + 1]) === 0) valid = 'divide0';
+    }
+
+    return valid;
 }
 
 function operate(operator, a, b) {
@@ -193,35 +244,11 @@ function multiply(a, b) {return a * b}
 
 function divide(a, b) {return a / b}
 
-function checkValid(numArray, opArray) {
-    let valid = true;
-    // check for multiple operators in a row
-    if (numArray.includes('') && numArray.length > 1) valid = false;
-    // check for multiple decimals in a number or digitless decimal
-    if (numArray.some(value => {
-        return value === '.' || value.split('.').length > 2;
-    })) valid = false;
-    // check for dividing by 0
-    for (let i = 0; i < opArray.length; i++) {
-        if (opArray[i] === '÷' && parseFloat(numArray[i + 1]) === 0) valid = 'divide0';
-    }
-    return valid;
-}
-
 function removeSpaces(array) {
-    let newArray = array;
+    let newArray = [...array];
     newArray = newArray.filter(value => value !== '');
     newArray = newArray.map(value => value[1]);
     return newArray;
-}
-
-function display(input) {
-    if (displayValue.classList.contains('solution')) {
-        btnClear.click();
-        displayValue.classList.remove('solution');
-    }
-    if (displayValue.clientWidth / displayValue.parentElement.clientWidth >= .91) return;
-    displayValue.textContent += input;
 }
 
 function backspace(num) {
