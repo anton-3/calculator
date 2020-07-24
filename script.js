@@ -21,6 +21,7 @@ const btnClear = document.querySelector('input[value="C"]');
 const btns = document.querySelectorAll('input');
 const operatorArray = ['+', '-', '×', '÷'];
 const displayValue = document.querySelector('div#display > p');
+const displayText = () => displayValue.textContent;
 
 // event listeners
 
@@ -41,9 +42,9 @@ btnSubtract.addEventListener('click', () => {display(' ' + btnSubtract.value + '
 btnAdd.addEventListener('click', () => {display(' ' + btnAdd.value + ' ')});
 
 btnBackspace.addEventListener('click', () => {
-    backspace(1);
-    if (checkOperator()) {
-        backspace(2);
+    displayValue.textContent = backspace(1, displayText());
+    if (checkOperator(displayText())) {
+        displayValue.textContent = backspace(2, displayText());
     }
 });
 
@@ -52,8 +53,8 @@ btnClear.addEventListener('click', () => {
 });
 
 btnEquals.addEventListener('click', () => {
-    if (displayValue.textContent === 'ERR') return;
-    const solution = calculate(displayValue.textContent);
+    if (displayText() === 'ERR') return;
+    const solution = calculate(displayText());
     // if (solution === 'ERR') return;
     btnClear.click();
     display(solution);
@@ -143,9 +144,9 @@ function calculate(input) {
     }
     console.log('VALID');
     
-    const equation = parseOrderOfOps(input);
-    console.log(input);
-    console.log(JSON.stringify(equation));
+    const equation = parseInput(input);
+    console.log('raw input:', input);
+    console.log('parsed input:', JSON.stringify(equation));
     displayValue.classList.add('solution');
     return evaluate(equation);
 }
@@ -164,24 +165,23 @@ function evaluate(equation) {
     return solution;
 }
 
-function parseOrderOfOps(input) {
+function parseInput(input) {
+    // input would be something like '1 + 1 * 1 - 1'
     let eq = input.split(' ');
     // convert numbers in equation to number data type
-    eq = eq.map((x, i) => {
-        return i % 2 === 0 ? +x : x;
-    });
+    eq = eq.map((x, index) => index % 2 === 0 ? +x : x);
 
     // move operations with priority into their own arrays ex. [1,'+',[1,'*',1],'-',1]
-    let mdIndexes = [];
+    let mdIndexes = []; // md = multiply & divide
     let mdSlices = [];
     eq.forEach((value, i) => {
         if (value === '×' || value === '÷') mdIndexes.push(i);
     });
     while (mdIndexes.length > 0) {
-        const start = 0;
-        const end = mdIndexes.findIndex((n, i) => mdIndexes[i+1] - n !== 2);
-        mdSlices.push([mdIndexes[start], mdIndexes[end]]);
-        mdIndexes.splice(start, end + 1);
+        const startIndex = 0;
+        const endIndex = mdIndexes.findIndex((n, i) => mdIndexes[i+1] - n !== 2);
+        mdSlices.push([mdIndexes[startIndex], mdIndexes[endIndex]]);
+        mdIndexes.splice(startIndex, endIndex + 1);
     }
     mdSlices.forEach(mdSlice => {
         const startIndex = mdSlice[0] - 1; // inclusive
@@ -189,6 +189,7 @@ function parseOrderOfOps(input) {
         const length = endIndex - startIndex;
         const slice = eq.slice(startIndex, endIndex);
         eq.splice(startIndex, length, slice);
+        // add nulls to keep eq length the same
         for (let i = 0; i < length - 1; i++) {
             eq.splice(startIndex, 0, null);
         }
@@ -252,12 +253,10 @@ function removeSpaces(array) {
     return newArray;
 }
 
-function backspace(num) {
-    displayValue.textContent = displayValue.textContent
-    .substring(0, displayValue.textContent.length - num);
+function backspace(num, str) {
+    return str.substring(0, str.length - num);
 }
 
-function checkOperator() {
-    return operatorArray.includes(displayValue
-    .textContent[displayValue.textContent.length - 1])
+function checkOperator(str) {
+    return operatorArray.includes(str[str.length - 1])
 }
